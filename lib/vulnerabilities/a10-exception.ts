@@ -30,7 +30,7 @@ export function vulnerableProcessCheckout(quantity: number): {
     success: true,
     status,
     orderId: "ORD-FAILOPEN-7749",
-    chargedAmount: quantity <= 0 ? 0 : quantity * 120,
+    chargedAmount: quantity <= 0 ? 0 : quantity * 9999,
     message: failOpenOccurred
       ? "EXCEPTION_CAUGHT: Server caught InvalidOrderQuantityException but exception handler failed open and completed order as PAID!"
       : "Order processed successfully.",

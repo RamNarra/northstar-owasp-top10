@@ -59,10 +59,10 @@ export default function SecurityFindingDrawer() {
             }
             setIsOpen(true);
           }}
-          className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-3.5 py-2 bg-slate-900 text-white rounded-full text-xs shadow-md hover:bg-slate-800 transition-all border border-slate-700 font-medium"
+          className="fixed bottom-6 right-6 z-50 flex items-center gap-1.5 px-3 py-1.5 bg-slate-900/90 hover:bg-slate-900 text-slate-100 rounded-full text-[11px] shadow-sm backdrop-blur-sm transition-all border border-slate-700/70 font-medium"
         >
-          <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-          <span>Security Note ({unlockedIds.length})</span>
+          <span className="text-slate-400 font-serif">ⓘ</span>
+          <span>Security note</span>
         </button>
       )}
 

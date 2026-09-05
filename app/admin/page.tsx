@@ -173,7 +173,7 @@ export default function AdminPage() {
           </p>
         </div>
         <span className="text-xs font-mono font-bold text-slate-900 bg-slate-100 px-3 py-1 rounded border border-slate-200">
-          Treasury Balance: $4,250,000 USD
+          Treasury Balance: ₹3,50,00,000 INR
         </span>
       </div>
 

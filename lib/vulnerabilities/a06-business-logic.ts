@@ -18,7 +18,10 @@ export function vulnerableApplyCoupon(currentDiscount: number, code: string): {
   newTotal: number;
   message: string;
 } {
-  const subtotal = 100;
+  const isLargeCurrency = currentDiscount >= 100;
+  const subtotal = isLargeCurrency ? 9999 : 100;
+  const step = isLargeCurrency ? 1000 : 10;
+
   if (code.trim().toUpperCase() !== "WELCOME10") {
     return {
       success: false,
@@ -28,14 +31,15 @@ export function vulnerableApplyCoupon(currentDiscount: number, code: string): {
     };
   }
 
-  // Flaw: repeatedly applies $10 without checking if already redeemed!
-  const newDiscount = currentDiscount + 10;
+  // Flaw: repeatedly applies discount without checking if already redeemed!
+  const newDiscount = currentDiscount + step;
   const newTotal = Math.max(0, subtotal - newDiscount);
 
+  const formattedDiscount = isLargeCurrency ? `₹${newDiscount.toLocaleString("en-IN")}` : `₹${newDiscount * 100}`;
   return {
     success: true,
     newDiscount,
     newTotal,
-    message: `Coupon WELCOME10 applied! Total discount is now $${newDiscount}.`,
+    message: `Coupon WELCOME10 applied! Total promotional savings is now ${formattedDiscount}.`,
   };
 }

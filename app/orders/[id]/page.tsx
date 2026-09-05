@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Package } from "lucide-react";
+import { formatInr } from "@/lib/fake-db";
 
 export default function OrderDetailPage() {
   const params = useParams();
@@ -99,8 +100,8 @@ export default function OrderDetailPage() {
                   <div className="font-semibold text-slate-900 text-sm">{order.item}</div>
                   <div className="text-slate-500 text-xs">Quantity: {order.quantity}</div>
                 </div>
-                <div className="font-semibold text-slate-900 text-sm">
-                  ${order.totalUsd?.toLocaleString()}.00 USD
+                <div className="font-semibold text-slate-900 text-sm font-mono">
+                  {formatInr(order.totalInr || order.totalUsd || 9999)}
                 </div>
               </div>
             </div>

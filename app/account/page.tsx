@@ -34,7 +34,6 @@ export default function AccountPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     try {
       const saved = localStorage.getItem("northstar_session_user");
       if (saved) setUser(JSON.parse(saved));
@@ -42,24 +41,23 @@ export default function AccountPage() {
       if (savedToken) {
         setToken(savedToken);
         parseJwt(savedToken);
-      } else {
-        fetchDefaultToken();
       }
     } catch (_e) {}
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const fetchDefaultToken = async () => {
+  const handleSignInAsStaff = async () => {
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: "alex@northstar.local", password: "training123" }),
+        body: JSON.stringify({ email: "alex@northstar.local", password: "password123!" }),
       });
       const data = await res.json();
       if (data.token) {
         setToken(data.token);
+        setUser(data.user);
         localStorage.setItem("northstar_jwt_token", data.token);
+        localStorage.setItem("northstar_session_user", JSON.stringify(data.user));
         parseJwt(data.token);
       }
     } catch (_e) {}
@@ -311,6 +309,18 @@ export default function AccountPage() {
               token headers, claims, and signature validity below.
             </p>
           </div>
+
+          {!token && (
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <span className="text-slate-600">No active session token found in browser storage.</span>
+              <button
+                onClick={handleSignInAsStaff}
+                className="px-3.5 py-2 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 transition-colors shadow-sm"
+              >
+                Sign In as Staff (Alex Rivera)
+              </button>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Header */}

@@ -40,10 +40,10 @@ export default function OrdersPage() {
                 Cloud Telemetry Starter Pack
               </h3>
               <p className="text-xs text-slate-500">
-                Quantity: 1 · Shipping to 404 Northstar Way, Suite 100
+                Quantity: 1 · Shipping to Plot 42, Electronics City Phase 1, Bengaluru
               </p>
               <div className="text-xs font-mono font-bold text-slate-900 pt-0.5">
-                $120.00 USD
+                ₹9,999 INR
               </div>
             </div>
           </div>

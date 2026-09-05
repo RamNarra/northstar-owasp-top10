@@ -231,24 +231,24 @@ const results = await db.execute(query, [\`%\${input}%\`]);`,
     briefing:
       "Northstar finance reported several customer orders completing with massive discounts far below allowed promotional margins.",
     objective:
-      "Exploit a missing state enforcement rule in the billing cart: apply the single-use `WELCOME10` promotional coupon repeatedly until the total discount reaches at least \$30.",
+      "Exploit a missing state enforcement rule in the billing cart: apply the single-use `WELCOME10` promotional coupon repeatedly until the total discount stacks beyond policy margins.",
     hints: [
-      "The system offers promotional code `WELCOME10` ($10 off a $100 cart). What happens if you apply it more than once?",
+      "The system offers promotional code `WELCOME10` (promotional equipment credit). What happens if you apply it more than once?",
       "Does the server check whether `coupon_applied` is already true before subtracting the discount?",
-      "Click Apply Coupon multiple times until the total discount reaches at least $30 ($100 down to $60 or less).",
+      "Click Apply Coupon multiple times until the total discount stacks repeatedly beyond authorized thresholds.",
     ],
     debrief: {
       whatHappened:
         "The promotional checkout flow lacked business-rule validation to enforce single-use redemption per checkout.",
       whyItWorked:
-        "The backend handler accepted the coupon code and subtracted \$10 without verifying whether a coupon was already attached to the order.",
+        "The backend handler accepted the coupon code and subtracted promotional savings without verifying whether a coupon was already attached to the order.",
       owasp2025Note:
         "A06:2025 Insecure Design focuses on missing security controls and flawed business logic that cannot be fixed by mere implementation hardening without designing proper domain invariants.",
       vulnerableSnippet: `// Vulnerable: lacks state check on coupon usage
 export async function applyCoupon(cart, code) {
   if (code === "WELCOME10") {
-    cart.discount += 10;
-    cart.total -= 10;
+    cart.discount += 1000; // ₹1,000 promotional credit
+    cart.total -= 1000;
   }
   return cart;
 }`,
@@ -261,7 +261,7 @@ export async function applyCoupon(cart, code) {
     throw new Error("Maximum 1 promotion allowed per order");
   }
   cart.appliedCoupons.push(code);
-  cart.discount = 10;
+  cart.discount = 1000;
   cart.total = Math.max(0, cart.subtotal - cart.discount);
   return cart;
 }`,

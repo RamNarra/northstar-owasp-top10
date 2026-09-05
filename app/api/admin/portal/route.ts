@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
         success: true,
         message: "ACCESS_GRANTED: Welcome to Northstar Executive Administration Portal.",
         role: "admin",
-        treasuryBalance: "$4,250,000 USD",
+        treasuryBalance: "₹3,50,00,000 INR",
         breachTriggered: true,
         flag: "NORTHSTAR{jwt_signature_verification_missing_a07}",
       });

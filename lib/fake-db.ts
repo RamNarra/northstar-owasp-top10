@@ -18,7 +18,8 @@ export interface CustomerOrder {
   customerEmail: string;
   item: string;
   quantity: number;
-  totalUsd: number;
+  totalInr: number;
+  totalUsd?: number;
   status: "CONFIRMED" | "PROCESSING" | "SHIPPED";
   shippingAddress: string;
 }
@@ -40,6 +41,33 @@ export interface AuditEvent {
   status: "SUCCESS" | "FAILURE";
   actor: string;
   ip: string;
+}
+
+export interface ProductSpecification {
+  label: string;
+  value: string;
+}
+
+export interface ProductItem {
+  id: string;
+  slug: string;
+  name: string;
+  category: string;
+  price: number;
+  description: string;
+  badge: string;
+  image: string;
+  specs: ProductSpecification[];
+  availability: string;
+  warranty: string;
+}
+
+export function formatInr(amount: number): string {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(amount);
 }
 
 export const SYNTHETIC_USERS: Record<string, UserAccount> = {
@@ -76,9 +104,10 @@ export const SYNTHETIC_ORDERS: Record<string, CustomerOrder> = {
     customerEmail: "alex@northstar.local",
     item: "Cloud Telemetry Starter Pack",
     quantity: 1,
+    totalInr: 9999,
     totalUsd: 120,
     status: "CONFIRMED",
-    shippingAddress: "404 Northstar Way, Suite 100, San Francisco, CA",
+    shippingAddress: "Plot 42, Electronics City Phase 1, Bengaluru, Karnataka 560100",
   },
   "1002": {
     id: "1002",
@@ -86,9 +115,10 @@ export const SYNTHETIC_ORDERS: Record<string, CustomerOrder> = {
     customerEmail: "bob@northstar.local",
     item: "Quantum VPN Gateway Hardware Appliance",
     quantity: 2,
+    totalInr: 399998,
     totalUsd: 2400,
     status: "SHIPPED",
-    shippingAddress: "77 Vance Refrigeration Blvd, Scranton, PA",
+    shippingAddress: "Road No. 36, Jubilee Hills, Hyderabad, Telangana 500033",
   },
   "1003": {
     id: "1003",
@@ -96,43 +126,44 @@ export const SYNTHETIC_ORDERS: Record<string, CustomerOrder> = {
     customerEmail: "admin@northstar.local",
     item: "Zero-Trust Perimeter Enforcer",
     quantity: 5,
+    totalInr: 1249995,
     totalUsd: 15000,
     status: "PROCESSING",
-    shippingAddress: "1 Executive Penthouse Suite, New York, NY",
+    shippingAddress: "Tower 2, Bandra Kurla Complex, Mumbai, Maharashtra 400051",
   },
 };
 
 export const CUSTOMER_DIRECTORY: CustomerDirectoryRecord[] = [
   {
     id: 101,
-    name: "Apex Logistics Corp",
-    organization: "Apex Enterprise",
+    name: "Apex Logistics India",
+    organization: "Apex Enterprise Logistics Ltd",
     email: "ops@apex-logistics.test",
-    tier: "Standard",
+    tier: "Premier Partner",
     isInternal: false,
   },
   {
     id: 102,
     name: "Beacon Health Networks",
-    organization: "Beacon Care",
+    organization: "Beacon Care Systems India",
     email: "compliance@beacon-health.test",
-    tier: "Enterprise",
+    tier: "Strategic Partner",
     isInternal: false,
   },
   {
     id: 103,
     name: "Crestview Financial",
-    organization: "Crestview LLC",
+    organization: "Crestview Financial Services",
     email: "security@crestview-fin.test",
-    tier: "Enterprise",
+    tier: "Enterprise Partner",
     isInternal: false,
   },
   {
     id: 104,
     name: "Delta Robotics Labs",
-    organization: "Delta Automation",
+    organization: "Delta Automation India",
     email: "labs@delta-robotics.test",
-    tier: "Standard",
+    tier: "Technology Partner",
     isInternal: false,
   },
   {
@@ -142,7 +173,7 @@ export const CUSTOMER_DIRECTORY: CustomerDirectoryRecord[] = [
     email: "treasury-vault@internal.northstar.local",
     tier: "CONFIDENTIAL_VIP",
     isInternal: true,
-    notes: "Treasury escrow allocation: $4,250,000 USD",
+    notes: "Treasury escrow allocation: ₹3,50,00,000 INR",
   },
 ];
 
@@ -181,47 +212,81 @@ export const INITIAL_AUDIT_LOGS: AuditEvent[] = [
   },
 ];
 
-
-export interface ProductItem {
-  id: string;
-  name: string;
-  category: string;
-  price: number;
-  description: string;
-  badge: string;
-}
-
 export const PRODUCTS: ProductItem[] = [
   {
     id: "prod-001",
+    slug: "cloud-telemetry-starter-pack",
     name: "Cloud Telemetry Starter Pack",
     category: "Monitoring & Observability",
-    price: 120,
-    description: "Compact multi-region telemetry beacon appliance with real-time audit streaming.",
+    price: 9999,
+    description: "Compact 1U rackmount edge telemetry appliance with real-time audit event streaming and TLS log forwarding.",
     badge: "Popular",
+    image: "/images/products/cloud-telemetry.jpg",
+    availability: "In Stock (Ships in 24 hours)",
+    warranty: "3 Years Comprehensive Hardware Replacement",
+    specs: [
+      { label: "Form Factor", value: "1U Rackmount / Desktop" },
+      { label: "Throughput", value: "2.5 Gbps Hardware Audit Pipeline" },
+      { label: "Telemetry Interfaces", value: "4x 1GbE RJ-45, 1x Dedicated Management" },
+      { label: "Power Supply", value: "Dual redundant 120W AC 100-240V" },
+      { label: "Certifications", value: "BIS, CE, FCC Class A, RoHS" },
+    ],
   },
   {
     id: "prod-002",
+    slug: "quantum-vpn-gateway",
     name: "Quantum VPN Gateway Hardware Appliance",
     category: "Zero-Trust Networking",
-    price: 2400,
-    description: "High-throughput edge perimeter encryptor featuring dual hardware crypto enclaves.",
+    price: 199999,
+    description: "High-throughput edge perimeter encryptor featuring dual hardware crypto enclaves and post-quantum tunnel negotiation.",
     badge: "Enterprise",
+    image: "/images/products/quantum-vpn.jpg",
+    availability: "In Stock (Ships from Bengaluru warehouse)",
+    warranty: "5 Years 24/7 Northstar Care Replacement",
+    specs: [
+      { label: "Form Factor", value: "High-density Compact Appliance" },
+      { label: "Encrypted Tunneling", value: "10 Gbps WireGuard & IPsec throughput" },
+      { label: "Hardware Security", value: "Dedicated Cryptographic Coprocessor Enclave" },
+      { label: "Ports", value: "1x 10GbE WAN, 4x Gigabit LAN, 1x Serial Console" },
+      { label: "MTBF", value: "> 350,000 Hours Continuous" },
+    ],
   },
   {
     id: "prod-003",
+    slug: "zerotrust-perimeter-enforcer",
     name: "Zero-Trust Perimeter Enforcer",
     category: "Access Enforcement",
-    price: 3000,
-    description: "Layer-7 policy router with integrated mutual TLS termination and continuous posture checks.",
+    price: 249999,
+    description: "Layer-7 policy router with integrated mutual TLS termination, continuous posture checks, and hardware acceleration.",
     badge: "New Release",
+    image: "/images/products/zero-trust.jpg",
+    availability: "Immediate Dispatch",
+    warranty: "5 Years Advance Hardware Replacement",
+    specs: [
+      { label: "Form Factor", value: "2U Rackmount Dual-Fan System" },
+      { label: "Network Capacity", value: "40 Gbps Aggregate Policy Switching" },
+      { label: "Fiber Uplinks", value: "8x 10G SFP+ Optical Ports, 2x 40G QSFP+" },
+      { label: "Inspection Engine", value: "Hardware-accelerated Stateful L7 Inspector" },
+      { label: "Redundancy", value: "Hot-swappable dual 450W power modules" },
+    ],
   },
   {
     id: "prod-004",
+    slug: "diagnostics-kit",
     name: "Support Monitoring & Diagnostics Kit",
     category: "Diagnostics & Health",
-    price: 180,
-    description: "Plug-and-play diagnostic probe for internal network latency and endpoint reliability.",
+    price: 14999,
+    description: "Ruggedized portable diagnostic console for internal network latency verification, packet jitter, and endpoint reliability.",
     badge: "Standard",
+    image: "/images/products/diagnostics-kit.jpg",
+    availability: "In Stock",
+    warranty: "2 Years Northstar Standard Coverage",
+    specs: [
+      { label: "Display", value: "4.3-inch High-contrast Sunlight Readable OLED" },
+      { label: "Battery Life", value: "14 Hours Continuous Field Operation" },
+      { label: "Interfaces", value: "2x 10G RJ45, 1x SFP+, Dual Band RF Analysis" },
+      { label: "Housing", value: "IP54 Dust & Shock Resistant Rugged Shell" },
+      { label: "Weight", value: "680g Field Portable" },
+    ],
   },
 ];

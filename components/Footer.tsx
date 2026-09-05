@@ -36,9 +36,9 @@ export default function Footer() {
             <h4 className="font-semibold text-slate-900 mb-3.5">Company</h4>
             <ul className="space-y-2.5 text-slate-500">
               <li><Link href="/about" className="hover:text-slate-900 transition-colors">About Northstar</Link></li>
-              <li><Link href="/directory" className="hover:text-slate-900 transition-colors">Partner Directory</Link></li>
-              <li><Link href="/about" className="hover:text-slate-900 transition-colors">System Architecture</Link></li>
-              <li><Link href="/robots.txt" className="hover:text-slate-900 transition-colors">Crawler Policy</Link></li>
+              <li><Link href="/partners" className="hover:text-slate-900 transition-colors">Partner Network</Link></li>
+              <li><Link href="/about#support" className="hover:text-slate-900 transition-colors">Support &amp; Inquiries</Link></li>
+              <li><span className="text-slate-400">Offices: Bengaluru &bull; Hyderabad &bull; Mumbai</span></li>
             </ul>
           </div>
         </div>

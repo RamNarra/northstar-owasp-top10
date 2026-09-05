@@ -42,8 +42,8 @@ export default function Navbar() {
             <Link href="/about" className="hover:text-slate-900 transition-colors">
               Company
             </Link>
-            <Link href="/directory" className="hover:text-slate-900 transition-colors">
-              Directory
+            <Link href="/about#support" className="hover:text-slate-900 transition-colors">
+              Support
             </Link>
           </nav>
         </div>
@@ -51,9 +51,9 @@ export default function Navbar() {
         {/* Right Navigation */}
         <div className="flex items-center gap-4">
           <Link
-            href="/directory"
+            href="/partners"
             className="p-2 text-slate-500 hover:text-slate-900 rounded-full hover:bg-slate-50 transition-colors"
-            title="Search Directory"
+            title="Search Partner Directory"
           >
             <Search className="w-4 h-4" />
           </Link>
