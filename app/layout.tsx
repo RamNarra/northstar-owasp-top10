@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import SecurityFindingDrawer from "@/components/SecurityFindingDrawer";
 
 export const metadata: Metadata = {
-  title: "Northstar Security Incident · OWASP Top 10:2025 & JWT Lab",
-  description: "Beginner-friendly incident investigation CTF teaching OWASP Top 10:2025 and JWT security.",
+  title: "Northstar · Modern Equipment for Secure Teams",
+  description: "Enterprise telemetry hardware, quantum perimeter appliances, and cloud infrastructure.",
 };
 
 export default function RootLayout({
@@ -14,7 +17,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen flex flex-col text-slate-900 bg-[#fbfcfd]">
-        {children}
+        <Navbar />
+        <main className="flex-1">{children}</main>
+        <Footer />
+        <SecurityFindingDrawer />
       </body>
     </html>
   );

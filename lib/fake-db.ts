@@ -180,3 +180,48 @@ export const INITIAL_AUDIT_LOGS: AuditEvent[] = [
     ip: "127.0.0.1",
   },
 ];
+
+
+export interface ProductItem {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  description: string;
+  badge: string;
+}
+
+export const PRODUCTS: ProductItem[] = [
+  {
+    id: "prod-001",
+    name: "Cloud Telemetry Starter Pack",
+    category: "Monitoring & Observability",
+    price: 120,
+    description: "Compact multi-region telemetry beacon appliance with real-time audit streaming.",
+    badge: "Popular",
+  },
+  {
+    id: "prod-002",
+    name: "Quantum VPN Gateway Hardware Appliance",
+    category: "Zero-Trust Networking",
+    price: 2400,
+    description: "High-throughput edge perimeter encryptor featuring dual hardware crypto enclaves.",
+    badge: "Enterprise",
+  },
+  {
+    id: "prod-003",
+    name: "Zero-Trust Perimeter Enforcer",
+    category: "Access Enforcement",
+    price: 3000,
+    description: "Layer-7 policy router with integrated mutual TLS termination and continuous posture checks.",
+    badge: "New Release",
+  },
+  {
+    id: "prod-004",
+    name: "Support Monitoring & Diagnostics Kit",
+    category: "Diagnostics & Health",
+    price: 180,
+    description: "Plug-and-play diagnostic probe for internal network latency and endpoint reliability.",
+    badge: "Standard",
+  },
+];
