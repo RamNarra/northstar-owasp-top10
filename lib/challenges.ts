@@ -282,8 +282,8 @@ export async function applyCoupon(cart, code) {
     objective:
       "Inspect Alex's issued JWT token, alter the payload claim from `role: 'user'` to `role: 'admin'`, observe that the signature becomes invalid, and submit the tampered token to `/api/admin/portal`.",
     hints: [
-      "Inspect the JWT structure in the Token Inspector: Header.Payload.Signature.",
-      "Notice how editing the payload recalculates the expected HMAC and marks the signature as INVALID ✗.",
+      "Inspect the JWT structure in the Session Inspector: HEADER . PAYLOAD . SIGNATURE.",
+      "Inspect the JWT. What happens to the signature if you change the `role` claim? Try `user → admin`, then submit the modified token.",
       "Submit your tampered token to `/api/admin/portal`. The vulnerable backend calls `decodeJwt` instead of `jwtVerify`, trusting the claim despite the invalid signature!",
     ],
     debrief: {

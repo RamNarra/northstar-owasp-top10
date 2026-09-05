@@ -28,6 +28,7 @@ export default function AccountPage() {
   const [token, setToken] = useState<string>("");
   const [headerJson, setHeaderJson] = useState<string>('{\n  "alg": "HS256",\n  "typ": "JWT"\n}');
   const [payloadJson, setPayloadJson] = useState<string>('{\n  "sub": "alex@northstar.local",\n  "name": "Alex Rivera",\n  "role": "user"\n}');
+  const [originalPayloadJson, setOriginalPayloadJson] = useState<string>("");
   const [signatureStr, setSignatureStr] = useState<string>("");
   const [isTampered, setIsTampered] = useState<boolean>(false);
   const [adminResult, setAdminResult] = useState<any>(null);
@@ -63,15 +64,26 @@ export default function AccountPage() {
     } catch (_e) {}
   };
 
+  const toBase64Url = (str: string) => {
+    return btoa(unescape(encodeURIComponent(str)))
+      .replace(/=/g, "")
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_");
+  };
+
   const parseJwt = (jwt: string) => {
     const parts = jwt.split(".");
     if (parts.length === 3) {
       try {
-        const h = JSON.parse(atob(parts[0]));
-        const p = JSON.parse(atob(parts[1]));
-        setHeaderJson(JSON.stringify(h, null, 2));
-        setPayloadJson(JSON.stringify(p, null, 2));
+        const h = JSON.parse(atob(parts[0].replace(/-/g, "+").replace(/_/g, "/")));
+        const p = JSON.parse(atob(parts[1].replace(/-/g, "+").replace(/_/g, "/")));
+        const hFormatted = JSON.stringify(h, null, 2);
+        const pFormatted = JSON.stringify(p, null, 2);
+        setHeaderJson(hFormatted);
+        setPayloadJson(pFormatted);
+        setOriginalPayloadJson(pFormatted);
         setSignatureStr(parts[2]);
+        setIsTampered(false);
       } catch (_e) {}
     }
   };
@@ -80,20 +92,24 @@ export default function AccountPage() {
     setPayloadJson(newText);
     try {
       const parsed = JSON.parse(newText);
-      setIsTampered(true);
-      const hB64 = btoa(headerJson).replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
-      const pB64 = btoa(JSON.stringify(parsed)).replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
+      let isModified = true;
+      try {
+        const orig = JSON.parse(originalPayloadJson);
+        isModified = JSON.stringify(parsed) !== JSON.stringify(orig);
+      } catch {
+        isModified = true;
+      }
+
+      setIsTampered(isModified);
+      const hB64 = toBase64Url(headerJson);
+      const pB64 = toBase64Url(JSON.stringify(parsed));
+      // Construct tampered token by attaching the ORIGINAL signature without resigning
       const tampered = `${hB64}.${pB64}.${signatureStr}`;
       setToken(tampered);
-    } catch (_e) {}
-  };
-
-  const handleTamperAdmin = () => {
-    try {
-      const parsed = JSON.parse(payloadJson);
-      parsed.role = "admin";
-      handlePayloadChange(JSON.stringify(parsed, null, 2));
-    } catch (_e) {}
+    } catch (_e) {
+      // Syntax error while student is manually editing JSON
+      setIsTampered(true);
+    }
   };
 
   const handleTestAdminAccess = async () => {
@@ -331,19 +347,21 @@ export default function AccountPage() {
 
             {/* Payload */}
             <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg text-xs space-y-2.5">
-              <span className="font-semibold text-slate-900 text-xs block">Payload (Claims)</span>
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-slate-900 text-xs block">Payload (Claims)</span>
+                <span className="text-[10px] text-slate-400 font-mono">Editable JSON</span>
+              </div>
               <textarea
                 value={payloadJson}
                 onChange={(e) => handlePayloadChange(e.target.value)}
-                rows={4}
-                className="w-full p-2 border border-slate-200 rounded-md text-[11px] font-mono bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                rows={6}
+                spellCheck={false}
+                className="w-full p-2.5 border border-slate-200 rounded-md text-[11px] font-mono bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 leading-relaxed"
+                placeholder="Edit JSON claims..."
               />
-              <button
-                onClick={handleTamperAdmin}
-                className="text-[11px] px-2.5 py-1 bg-slate-900 text-white rounded hover:bg-slate-800 transition-colors"
-              >
-                Change role to &quot;admin&quot;
-              </button>
+              <p className="text-[10px] text-slate-500">
+                Edit the claims above directly (e.g. change <code>&quot;role&quot;: &quot;user&quot;</code> to <code>&quot;role&quot;: &quot;admin&quot;</code>).
+              </p>
             </div>
 
             {/* Signature */}
@@ -373,14 +391,14 @@ export default function AccountPage() {
           {/* Test Admin Route Button */}
           <div className="flex items-center justify-between pt-3 border-t border-slate-100">
             <span className="text-xs text-slate-400 font-mono">
-              Target: /api/admin/portal
+              Target: POST /api/admin/portal
             </span>
             <button
               onClick={handleTestAdminAccess}
               disabled={isLoading}
               className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-md text-xs font-medium transition-colors disabled:opacity-50 shadow-sm"
             >
-              {isLoading ? "Validating..." : "Test Administrator Access"}
+              {isLoading ? "Validating..." : "Test Tampered Token"}
             </button>
           </div>
 
@@ -388,16 +406,30 @@ export default function AccountPage() {
             <div
               className={`p-4 rounded-lg border text-xs leading-relaxed ${
                 adminResult.breachTriggered
-                  ? "bg-amber-50/80 border-amber-200 text-amber-950"
+                  ? "bg-emerald-50/80 border-emerald-200 text-emerald-950 space-y-2.5"
                   : "bg-slate-50 border-slate-200 text-slate-700"
               }`}
             >
-              <div className="font-semibold">
-                {adminResult.breachTriggered ? "Admin Access Granted" : "Access Denied"}
+              <div className="font-semibold flex items-center gap-1.5">
+                {adminResult.breachTriggered ? (
+                  <>
+                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                    <span>Admin Access Granted</span>
+                  </>
+                ) : (
+                  <span>Access Denied</span>
+                )}
               </div>
-              <p className="text-xs mt-1 text-slate-700">
+              <p className="text-xs text-slate-700">
                 {adminResult.message || adminResult.error}
               </p>
+              {adminResult.breachTriggered && (
+                <div className="pt-2 border-t border-emerald-200/60 text-[11px] text-slate-600 space-y-1">
+                  <div><strong>What happened:</strong> The JWT payload was manually modified, causing the cryptographic signature to become invalid.</div>
+                  <div><strong>Why it succeeded:</strong> The server inspected the decoded <code>role</code> claim using <code>decodeJwt()</code> without calling <code>jwtVerify()</code> with the secret key.</div>
+                  <div><strong>Root Cause:</strong> Missing JWT signature verification before evaluating claims.</div>
+                </div>
+              )}
             </div>
           )}
         </div>
