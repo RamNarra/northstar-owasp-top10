@@ -3,8 +3,9 @@ import { vulnerableGetOrder } from "@/lib/vulnerabilities/a01-access-control";
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  props: { params: Promise<{ id: string }> }
 ) {
+  const params = await props.params;
   const { order, isVulnerableExposure } = vulnerableGetOrder(params.id);
 
   if (!order) {

@@ -46,7 +46,7 @@ export const INCIDENT_EVIDENCE: Record<string, EvidenceItem> = {
     chapterId: "A06",
     source: "Finance Fraud Detection Unit",
     timestamp: "06:55 UTC",
-    alert: "Multiple e-commerce transactions completed with cumulative discounts exceeding the maximum \$10 allowance.",
+    alert: "Multiple e-commerce transactions completed with cumulative discounts exceeding the maximum ₹1,000 allowance.",
     context: "The promotional coupon redemption logic does not verify if the coupon has already been applied to the active checkout session.",
   },
   A07: {

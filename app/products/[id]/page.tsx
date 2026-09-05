@@ -5,17 +5,18 @@ import { PRODUCTS, formatInr } from "@/lib/fake-db";
 import { ArrowLeft, ShieldCheck, Truck, Clock, Check, FileText } from "lucide-react";
 
 interface Props {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export function generateStaticParams() {
   return PRODUCTS.map((p) => ({ id: p.slug }));
 }
 
-export default function ProductDetailPage({ params }: Props) {
-  const product = PRODUCTS.find((p) => p.slug === params.id || p.id === params.id);
+export default async function ProductDetailPage({ params }: Props) {
+  const { id } = await params;
+  const product = PRODUCTS.find((p) => p.slug === id || p.id === id);
 
   if (!product) {
     notFound();

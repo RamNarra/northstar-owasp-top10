@@ -1,7 +1,7 @@
 /**
  * A06: Insecure Design (Business Logic Flaw - Coupon Multi-Use)
  * Educational Vulnerability:
- * The checkout coupon handler deducts $10 for WELCOME10, but fails to check
+ * The checkout coupon handler deducts ₹1,000 for WELCOME10, but fails to check
  * whether the coupon has already been redeemed on the active cart.
  */
 export interface CartState {
