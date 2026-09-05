@@ -51,7 +51,7 @@ const WORKSHOP_JOURNEY = [
   },
 ];
 
-async function makeRequest(targetUrl: string, action: typeof ACTIONS[0]): Promise<RequestSample> {
+async function makeRequest(targetUrl: string, action: (typeof WORKSHOP_JOURNEY)[0]): Promise<RequestSample> {
   const url = new URL(action.path, targetUrl);
   const isHttps = url.protocol === "https:";
   const client = isHttps ? https : http;
