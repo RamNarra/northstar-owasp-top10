@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { Package, ArrowLeft, ShieldAlert, CheckCircle, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Package } from "lucide-react";
 
 export default function OrderDetailPage() {
   const params = useParams();
@@ -11,7 +11,6 @@ export default function OrderDetailPage() {
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
-  const [idorBreach, setIdorBreach] = useState<boolean>(false);
 
   useEffect(() => {
     async function loadOrder() {
@@ -24,8 +23,7 @@ export default function OrderDetailPage() {
         if (res.ok && data.order) {
           setOrder(data.order);
           if (data.breachTriggered) {
-            setIdorBreach(true);
-            // Unlock A01 finding
+            // Unobtrusively unlock A01 Security Note
             window.dispatchEvent(
               new CustomEvent("northstar_finding", { detail: { id: "A01" } })
             );
@@ -52,77 +50,64 @@ export default function OrderDetailPage() {
         <span>Back to Order History</span>
       </Link>
 
-      {/* Subtle IDOR banner if Alex accessed Bob's order */}
-      {idorBreach && (
-        <div className="p-4 bg-amber-50 border border-amber-300 rounded-lg text-xs space-y-1 text-amber-950">
-          <div className="flex items-center gap-2 font-bold text-amber-900">
-            <ShieldAlert className="w-4 h-4 text-amber-600" />
-            <span>Cross-Tenant Authorization Anomaly Detected</span>
-          </div>
-          <p className="leading-relaxed">
-            You accessed <strong>Order #{orderId}</strong> belonging to <strong>{order?.customerEmail}</strong> without ownership verification.
-          </p>
-        </div>
-      )}
-
       {loading ? (
-        <div className="p-12 text-center text-xs text-slate-500 font-mono">
+        <div className="p-16 text-center text-xs text-slate-400">
           Loading order details...
         </div>
       ) : error ? (
-        <div className="p-6 bg-red-50 border border-red-200 text-red-700 text-xs rounded-lg">
+        <div className="p-6 bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-lg">
           {error}
         </div>
       ) : (
-        <div className="border border-slate-200 rounded-lg bg-white overflow-hidden shadow-sm">
-          <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+        <div className="border border-slate-200/80 rounded-xl bg-white overflow-hidden shadow-sm">
+          <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/40">
             <div>
-              <div className="text-[11px] text-slate-500 font-mono uppercase">
-                Invoice &amp; Packing Slip
+              <div className="text-[11px] text-slate-400 font-mono uppercase">
+                Invoice Reference
               </div>
-              <h1 className="text-lg font-bold text-slate-900 font-mono">
+              <h1 className="text-xl font-bold text-slate-900 font-mono">
                 Order #{order.id}
               </h1>
             </div>
-            <span className="px-2.5 py-1 bg-slate-200 text-slate-800 rounded text-xs font-mono font-semibold">
+            <span className="px-3 py-1 bg-slate-100 text-slate-800 rounded-full text-xs font-medium">
               {order.status}
             </span>
           </div>
 
-          <div className="p-6 space-y-6 text-xs">
-            <div className="grid grid-cols-2 gap-4 pb-4 border-b border-slate-100">
+          <div className="p-6 sm:p-8 space-y-6 text-xs">
+            <div className="grid grid-cols-2 gap-4 pb-5 border-b border-slate-100">
               <div>
-                <span className="text-slate-500 block mb-0.5">Purchaser Account:</span>
-                <span className="font-semibold text-slate-900 font-mono">
+                <span className="text-slate-400 block mb-1">Purchaser</span>
+                <span className="font-semibold text-slate-900">
                   {order.customerEmail}
                 </span>
               </div>
               <div>
-                <span className="text-slate-500 block mb-0.5">Account ID:</span>
-                <span className="font-semibold text-slate-900 font-mono">
+                <span className="text-slate-400 block mb-1">Account ID</span>
+                <span className="font-mono text-slate-700">
                   {order.userId}
                 </span>
               </div>
             </div>
 
-            <div className="space-y-2">
-              <span className="font-semibold text-slate-800 uppercase font-mono text-[11px] block">
-                Line Items:
+            <div className="space-y-3">
+              <span className="font-medium text-slate-700 text-xs block">
+                Line Items
               </span>
-              <div className="flex items-center justify-between p-3 bg-slate-50 rounded border border-slate-200">
+              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-100">
                 <div className="space-y-0.5">
-                  <div className="font-semibold text-slate-900">{order.item}</div>
-                  <div className="text-slate-500 text-[11px]">Quantity: {order.quantity}</div>
+                  <div className="font-semibold text-slate-900 text-sm">{order.item}</div>
+                  <div className="text-slate-500 text-xs">Quantity: {order.quantity}</div>
                 </div>
-                <div className="font-mono font-bold text-slate-900">
+                <div className="font-semibold text-slate-900 text-sm">
                   ${order.totalUsd?.toLocaleString()}.00 USD
                 </div>
               </div>
             </div>
 
-            <div className="pt-2 border-t border-slate-100">
-              <span className="text-slate-500 block mb-0.5">Destination Shipping Address:</span>
-              <p className="text-slate-800 font-mono">{order.shippingAddress}</p>
+            <div className="pt-3 border-t border-slate-100">
+              <span className="text-slate-400 block mb-1">Delivery Address</span>
+              <p className="text-slate-700">{order.shippingAddress}</p>
             </div>
           </div>
         </div>

@@ -8,20 +8,15 @@ import {
   Shield,
   Download,
   Key,
-  Package,
   LogOut,
-  CheckCircle,
-  AlertTriangle,
-  Lock,
-  ArrowRight,
   ShieldCheck,
-  ShieldX,
-  Terminal,
+  ShieldAlert,
+  ArrowRight,
 } from "lucide-react";
 
 export default function AccountPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"overview" | "privacy" | "security">("overview");
+  const [activeTab, setActiveTab] = useState<"profile" | "privacy" | "security">("profile");
   const [user, setUser] = useState<any>({ name: "Alex Rivera", email: "alex@northstar.local", role: "user" });
 
   // A04 state
@@ -165,26 +160,26 @@ export default function AccountPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 space-y-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-14 space-y-8">
       {/* Account Header */}
-      <div className="flex items-center justify-between border-b border-slate-200 pb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-sm">
+      <div className="flex items-center justify-between border-b border-slate-100 pb-5">
+        <div className="flex items-center gap-3.5">
+          <div className="w-11 h-11 rounded-full bg-slate-900 text-white flex items-center justify-center font-semibold text-sm">
             {user.name?.[0] || "A"}
           </div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-950">
+            <h1 className="text-xl font-bold tracking-tight text-slate-900">
               {user.name}
             </h1>
-            <p className="text-xs text-slate-500 font-mono">
-              {user.email} · Tier: Standard Operator
+            <p className="text-xs text-slate-500">
+              {user.email} · Standard Account
             </p>
           </div>
         </div>
 
         <button
           onClick={handleLogout}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-slate-600 hover:text-slate-900 border border-slate-200 rounded hover:bg-slate-50 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 border border-slate-200 rounded-md hover:bg-slate-50 transition-colors"
         >
           <LogOut className="w-3.5 h-3.5" />
           <span>Sign Out</span>
@@ -192,61 +187,61 @@ export default function AccountPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-200 text-xs font-medium gap-1">
+      <div className="flex border-b border-slate-100 text-xs font-medium gap-6">
         <button
-          onClick={() => setActiveTab("overview")}
-          className={`px-4 py-2 border-b-2 transition-colors ${
-            activeTab === "overview"
+          onClick={() => setActiveTab("profile")}
+          className={`pb-3 border-b-2 transition-colors ${
+            activeTab === "profile"
               ? "border-slate-900 text-slate-900 font-semibold"
-              : "border-transparent text-slate-500 hover:text-slate-900"
+              : "border-transparent text-slate-400 hover:text-slate-700"
           }`}
         >
-          Overview &amp; Profile
+          Profile &amp; Orders
         </button>
         <button
           onClick={() => setActiveTab("privacy")}
-          className={`px-4 py-2 border-b-2 transition-colors ${
+          className={`pb-3 border-b-2 transition-colors ${
             activeTab === "privacy"
               ? "border-slate-900 text-slate-900 font-semibold"
-              : "border-transparent text-slate-500 hover:text-slate-900"
+              : "border-transparent text-slate-400 hover:text-slate-700"
           }`}
         >
-          Privacy &amp; Data Export
+          Data &amp; Privacy
         </button>
         <button
           onClick={() => setActiveTab("security")}
-          className={`px-4 py-2 border-b-2 transition-colors ${
+          className={`pb-3 border-b-2 transition-colors ${
             activeTab === "security"
               ? "border-slate-900 text-slate-900 font-semibold"
-              : "border-transparent text-slate-500 hover:text-slate-900"
+              : "border-transparent text-slate-400 hover:text-slate-700"
           }`}
         >
-          Security &amp; Session Tokens
+          Security &amp; Session
         </button>
       </div>
 
-      {/* Overview Tab */}
-      {activeTab === "overview" && (
-        <div className="border border-slate-200 rounded-lg bg-white p-6 space-y-6 shadow-sm">
+      {/* Profile Tab */}
+      {activeTab === "profile" && (
+        <div className="border border-slate-200/80 rounded-xl bg-white p-6 sm:p-8 space-y-6 shadow-sm">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-            <div className="p-4 bg-slate-50 rounded border border-slate-100 space-y-1">
-              <span className="text-slate-500 block">User Identifier</span>
-              <span className="font-mono font-semibold text-slate-900">usr-101</span>
+            <div className="p-4 bg-slate-50 rounded-lg border border-slate-100 space-y-1">
+              <span className="text-slate-400 block">Account Identifier</span>
+              <span className="font-mono text-slate-800">usr-101</span>
             </div>
-            <div className="p-4 bg-slate-50 rounded border border-slate-100 space-y-1">
-              <span className="text-slate-500 block">Role Assignment</span>
-              <span className="font-mono font-semibold text-slate-900">Standard User (user)</span>
+            <div className="p-4 bg-slate-50 rounded-lg border border-slate-100 space-y-1">
+              <span className="text-slate-400 block">Permission Level</span>
+              <span className="text-slate-800 font-medium">Standard User</span>
             </div>
           </div>
 
           <div className="pt-2 flex items-center justify-between border-t border-slate-100 text-xs">
-            <div className="space-y-0.5">
-              <span className="font-semibold text-slate-900">Order Management</span>
-              <p className="text-slate-500">Track current hardware shipments and view past receipts.</p>
+            <div>
+              <span className="font-semibold text-slate-900 block">Order History</span>
+              <p className="text-slate-500">Track shipments and view past receipts.</p>
             </div>
             <Link
               href="/orders"
-              className="px-4 py-2 bg-slate-900 text-white rounded font-medium hover:bg-slate-800 transition-colors"
+              className="px-4 py-2 bg-slate-900 text-white rounded-md font-medium hover:bg-slate-800 transition-colors shadow-sm"
             >
               View Orders
             </Link>
@@ -256,52 +251,47 @@ export default function AccountPage() {
 
       {/* Privacy Tab (A04) */}
       {activeTab === "privacy" && (
-        <div className="border border-slate-200 rounded-lg bg-white p-6 space-y-6 shadow-sm">
+        <div className="border border-slate-200/80 rounded-xl bg-white p-6 sm:p-8 space-y-6 shadow-sm">
           <div className="space-y-1">
-            <h3 className="font-bold text-sm text-slate-900">Download Account Data Backup</h3>
-            <p className="text-xs text-slate-500 leading-relaxed">
-              In compliance with enterprise portability policies, you can export a complete JSON
-              backup archive of your profile and encrypted credentials.
+            <h3 className="font-semibold text-sm text-slate-900">Download Account Data</h3>
+            <p className="text-xs text-slate-500 leading-relaxed max-w-xl">
+              Download a complete JSON export of your personal profile and account credentials.
             </p>
-          </div>
-
-          <div className="p-3 bg-slate-50 border border-slate-200 rounded text-[11px] font-mono text-slate-600">
-            <strong>LAB FIXTURE NOTE:</strong> Backups in this environment contain synthetic training data only.
           </div>
 
           <button
             onClick={handleExportData}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 text-white text-xs font-semibold rounded hover:bg-slate-800 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 text-white text-xs font-medium rounded-md hover:bg-slate-800 transition-colors shadow-sm"
           >
             <Download className="w-3.5 h-3.5" />
-            <span>Generate Backup Archive</span>
+            <span>Generate Account Export</span>
           </button>
 
           {backupExport && (
-            <div className="p-4 bg-slate-50 border border-slate-200 rounded text-xs font-mono space-y-4">
-              <pre className="whitespace-pre-wrap">{JSON.stringify(backupExport, null, 2)}</pre>
+            <div className="p-5 bg-slate-50 rounded-lg border border-slate-200/80 text-xs font-mono space-y-4">
+              <pre className="whitespace-pre-wrap text-slate-700">{JSON.stringify(backupExport, null, 2)}</pre>
 
-              <div className="pt-3 border-t border-slate-200 space-y-2">
-                <span className="text-slate-700 font-sans font-semibold block">
-                  Verify Decoded Plaintext Credential:
+              <div className="pt-3 border-t border-slate-200/80 space-y-2 font-sans">
+                <span className="text-slate-700 font-medium block">
+                  Verify credential:
                 </span>
                 <div className="flex gap-2">
                   <input
                     type="text"
                     value={decodedInput}
                     onChange={(e) => setDecodedInput(e.target.value)}
-                    placeholder="Enter decoded password..."
-                    className="flex-1 px-3 py-1.5 border border-slate-300 rounded font-mono text-xs"
+                    placeholder="Enter plaintext credential..."
+                    className="flex-1 px-3 py-1.5 border border-slate-200 rounded-md font-mono text-xs focus:outline-none focus:ring-1 focus:ring-slate-900"
                   />
                   <button
                     onClick={handleVerifyDecoded}
-                    className="px-4 py-1.5 bg-slate-900 text-white rounded text-xs font-semibold hover:bg-slate-800"
+                    className="px-4 py-1.5 bg-slate-900 text-white rounded-md text-xs font-medium hover:bg-slate-800"
                   >
-                    Submit
+                    Confirm
                   </button>
                 </div>
                 {verifyFeedback && (
-                  <p className="text-[11px] text-slate-700 font-sans mt-1">
+                  <p className="text-[11px] text-slate-600 mt-1">
                     {verifyFeedback}
                   </p>
                 )}
@@ -313,96 +303,91 @@ export default function AccountPage() {
 
       {/* Security & JWT Session Tab (A07) */}
       {activeTab === "security" && (
-        <div className="border border-slate-200 rounded-lg bg-white p-6 space-y-6 shadow-sm">
+        <div className="border border-slate-200/80 rounded-xl bg-white p-6 sm:p-8 space-y-6 shadow-sm">
           <div className="space-y-1">
-            <h3 className="font-bold text-sm text-slate-900">Active Authentication Session</h3>
-            <p className="text-xs text-slate-500 leading-relaxed">
-              Your session is authenticated via signed JSON Web Tokens (JWT). Developers can inspect
-              token claims and signature integrity below.
+            <h3 className="font-semibold text-sm text-slate-900">Current Session Details</h3>
+            <p className="text-xs text-slate-500 leading-relaxed max-w-xl">
+              Your active session token governs API permissions. Developers and auditors can inspect
+              token headers, claims, and signature validity below.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Header */}
-            <div className="p-3 bg-red-50/40 border border-red-200 rounded text-xs font-mono space-y-1">
-              <span className="font-bold text-red-900 text-[11px] block">1. Header (Algorithm)</span>
-              <pre className="text-red-950 whitespace-pre-wrap text-[11px]">{headerJson}</pre>
+            <div className="p-4 bg-slate-50 border border-slate-100 rounded-lg text-xs space-y-2">
+              <span className="font-semibold text-slate-700 text-xs block">Header</span>
+              <pre className="font-mono text-slate-600 whitespace-pre-wrap text-[11px]">{headerJson}</pre>
             </div>
 
             {/* Payload */}
-            <div className="p-3 bg-purple-50/40 border border-purple-300 rounded text-xs font-mono space-y-2">
-              <span className="font-bold text-purple-900 text-[11px] block">2. Payload (Claims)</span>
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg text-xs space-y-2.5">
+              <span className="font-semibold text-slate-900 text-xs block">Payload (Claims)</span>
               <textarea
                 value={payloadJson}
                 onChange={(e) => handlePayloadChange(e.target.value)}
                 rows={4}
-                className="w-full p-1.5 border border-purple-200 rounded text-[11px] font-mono bg-white text-purple-950"
+                className="w-full p-2 border border-slate-200 rounded-md text-[11px] font-mono bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
               />
               <button
                 onClick={handleTamperAdmin}
-                className="text-[10px] px-2 py-1 bg-purple-600 text-white rounded hover:bg-purple-700"
+                className="text-[11px] px-2.5 py-1 bg-slate-900 text-white rounded hover:bg-slate-800 transition-colors"
               >
-                Tamper: Set role to &quot;admin&quot;
+                Change role to &quot;admin&quot;
               </button>
             </div>
 
             {/* Signature */}
-            <div className="p-3 bg-blue-50/40 border border-blue-200 rounded text-xs font-mono flex flex-col justify-between">
+            <div className="p-4 bg-slate-50 border border-slate-100 rounded-lg text-xs flex flex-col justify-between">
               <div>
-                <span className="font-bold text-blue-900 text-[11px] block mb-1">
-                  3. Signature Integrity
+                <span className="font-semibold text-slate-700 text-xs block mb-2">
+                  Signature Integrity
                 </span>
                 {!isTampered ? (
-                  <div className="p-2 bg-emerald-100 border border-emerald-300 text-emerald-900 rounded text-[11px] font-semibold flex items-center gap-1.5">
-                    <ShieldCheck className="w-4 h-4 text-emerald-700" />
-                    <span>Signature: VALID ✓</span>
+                  <div className="p-2.5 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-md text-xs font-medium flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                    <span>Signature: Valid ✓</span>
                   </div>
                 ) : (
-                  <div className="p-2 bg-red-100 border border-red-300 text-red-900 rounded text-[11px] font-semibold flex items-center gap-1.5">
-                    <ShieldX className="w-4 h-4 text-red-700" />
-                    <span>Signature: INVALID ✗</span>
+                  <div className="p-2.5 bg-red-50 border border-red-200 text-red-900 rounded-md text-xs font-medium flex items-center gap-1.5">
+                    <ShieldAlert className="w-4 h-4 text-red-600" />
+                    <span>Signature: Invalid ✗</span>
                   </div>
                 )}
               </div>
-              <div className="text-[10px] text-slate-500 font-mono truncate mt-2">
-                Sig: {signatureStr || "..."}
+              <div className="text-[10px] text-slate-400 font-mono truncate mt-3">
+                {signatureStr || "..."}
               </div>
             </div>
           </div>
 
           {/* Test Admin Route Button */}
-          <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-            <span className="text-xs text-slate-500 font-mono">
-              Target: <code>POST /api/admin/portal</code>
+          <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+            <span className="text-xs text-slate-400 font-mono">
+              Target: /api/admin/portal
             </span>
             <button
               onClick={handleTestAdminAccess}
               disabled={isLoading}
-              className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded text-xs font-semibold transition-colors disabled:opacity-50"
+              className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-md text-xs font-medium transition-colors disabled:opacity-50 shadow-sm"
             >
-              {isLoading ? "Validating Session..." : "Test Administrator Access"}
+              {isLoading ? "Validating..." : "Test Administrator Access"}
             </button>
           </div>
 
           {adminResult && (
             <div
-              className={`p-4 rounded border text-xs font-mono space-y-2 ${
+              className={`p-4 rounded-lg border text-xs leading-relaxed ${
                 adminResult.breachTriggered
-                  ? "bg-amber-50 border-amber-300 text-amber-950"
-                  : "bg-slate-100 border-slate-200 text-slate-800"
+                  ? "bg-amber-50/80 border-amber-200 text-amber-950"
+                  : "bg-slate-50 border-slate-200 text-slate-700"
               }`}
             >
-              <div className="font-bold">
-                {adminResult.breachTriggered ? "ADMIN_ACCESS_GRANTED" : "ACCESS_DENIED"}
+              <div className="font-semibold">
+                {adminResult.breachTriggered ? "Admin Access Granted" : "Access Denied"}
               </div>
-              <p className="font-sans text-[11px] leading-relaxed">
+              <p className="text-xs mt-1 text-slate-700">
                 {adminResult.message || adminResult.error}
               </p>
-              {adminResult.breachTriggered && isTampered && (
-                <div className="p-2.5 bg-amber-100 border border-amber-300 rounded text-[11px] text-amber-950 font-sans">
-                  <strong>Pedagogical Insight:</strong> Notice how the signature badge above shows <strong>INVALID ✗</strong>, yet the backend authorized access anyway because it executed <code>decodeJwt()</code> without verifying cryptographic authenticity!
-                </div>
-              )}
             </div>
           )}
         </div>
