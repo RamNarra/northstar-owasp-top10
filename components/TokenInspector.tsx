@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ShieldCheck, ShieldX, Terminal, ArrowRight, RefreshCw, Key } from "lucide-react";
+import { ShieldCheck, ShieldX, Terminal, ArrowRight, RefreshCw, Key, AlertTriangle } from "lucide-react";
 
 interface TokenInspectorProps {
   onSolved: (flag: string) => void;
@@ -15,7 +15,6 @@ export default function TokenInspector({ onSolved, isSolved }: TokenInspectorPro
     '{\n  "sub": "alex@northstar.local",\n  "name": "Alex Rivera",\n  "role": "user"\n}'
   );
   const [signatureStr, setSignatureStr] = useState<string>("");
-  const [originalToken, setOriginalToken] = useState<string>("");
   const [isTampered, setIsTampered] = useState<boolean>(false);
   const [apiResponse, setApiResponse] = useState<any>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -23,6 +22,7 @@ export default function TokenInspector({ onSolved, isSolved }: TokenInspectorPro
   // Generate initial token on mount
   useEffect(() => {
     fetchInitialToken();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchInitialToken = async () => {
@@ -36,7 +36,6 @@ export default function TokenInspector({ onSolved, isSolved }: TokenInspectorPro
       const data = await res.json();
       if (data.token) {
         setToken(data.token);
-        setOriginalToken(data.token);
         parseAndDisplayToken(data.token);
         setIsTampered(false);
       }
@@ -56,9 +55,7 @@ export default function TokenInspector({ onSolved, isSolved }: TokenInspectorPro
         setHeaderJson(JSON.stringify(header, null, 2));
         setPayloadJson(JSON.stringify(payload, null, 2));
         setSignatureStr(parts[2]);
-      } catch (_e) {
-        // base64 parsing error
-      }
+      } catch (_e) {}
     }
   };
 
@@ -66,7 +63,6 @@ export default function TokenInspector({ onSolved, isSolved }: TokenInspectorPro
     setPayloadJson(newText);
     try {
       const parsed = JSON.parse(newText);
-      const isRoleAdmin = parsed.role === "admin";
       setIsTampered(true);
 
       // Reconstruct token with tampered payload and original signature
@@ -75,7 +71,7 @@ export default function TokenInspector({ onSolved, isSolved }: TokenInspectorPro
       const reconstructedJwt = `${headerPart}.${payloadPart}.${signatureStr}`;
       setToken(reconstructedJwt);
     } catch (_e) {
-      // JSON syntax in progress
+      // in progress
     }
   };
 
@@ -113,18 +109,18 @@ export default function TokenInspector({ onSolved, isSolved }: TokenInspectorPro
 
   return (
     <div className="space-y-4">
-      {/* Session summary */}
+      {/* Active Identity Context */}
       <div className="flex flex-wrap items-center justify-between gap-2 p-3 bg-slate-50 border border-slate-200 rounded text-xs font-mono">
         <div className="flex items-center gap-2">
           <Key className="w-4 h-4 text-slate-600" />
-          <span>Active Session: <strong>alex@northstar.local</strong> (Standard User)</span>
+          <span>Authentication Status: <strong>alex@northstar.local</strong> (Standard User Claim)</span>
         </div>
         <button
           onClick={fetchInitialToken}
           className="flex items-center gap-1 text-slate-600 hover:text-slate-900 transition-colors"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`} />
-          <span>Reset Fresh Token</span>
+          <span>Reset Fresh Valid Token</span>
         </button>
       </div>
 
@@ -157,7 +153,7 @@ export default function TokenInspector({ onSolved, isSolved }: TokenInspectorPro
             onClick={handleEscalateToAdmin}
             className="mt-2 text-[11px] px-2 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
           >
-            Quick Edit: Change role to &quot;admin&quot;
+            Tamper: Set role to &quot;admin&quot;
           </button>
         </div>
 
@@ -188,7 +184,7 @@ export default function TokenInspector({ onSolved, isSolved }: TokenInspectorPro
                 <div>
                   <div className="font-bold text-[11px]">Signature: INVALID ✗</div>
                   <div className="text-[10px] text-red-800 leading-tight">
-                    Payload was altered! Cryptographic HMAC mismatch.
+                    Payload altered! Cryptographic HMAC mismatch.
                   </div>
                 </div>
               </div>
@@ -196,7 +192,7 @@ export default function TokenInspector({ onSolved, isSolved }: TokenInspectorPro
           </div>
 
           <div className="mt-3">
-            <span className="text-[10px] text-slate-600 block">Current Signature Hash:</span>
+            <span className="text-[10px] text-slate-600 block">Current Signature:</span>
             <div className="truncate font-mono text-[10px] text-slate-700 bg-white p-1 rounded border border-slate-200">
               {signatureStr || "..."}
             </div>
@@ -204,7 +200,7 @@ export default function TokenInspector({ onSolved, isSolved }: TokenInspectorPro
         </div>
       </div>
 
-      {/* Raw Token String */}
+      {/* Raw Assembled Token */}
       <div className="p-2.5 bg-slate-900 text-slate-300 rounded font-mono text-xs overflow-x-auto">
         <span className="text-[10px] uppercase text-slate-500 block mb-1">
           Assembled HTTP Bearer Token:
@@ -227,24 +223,27 @@ export default function TokenInspector({ onSolved, isSolved }: TokenInspectorPro
         </button>
       </div>
 
-      {/* Response Box */}
+      {/* Explicit Pedagogical Contradiction Alert */}
       {apiResponse && (
         <div
-          className={`p-3 rounded border text-xs font-mono ${
+          className={`p-3.5 rounded border text-xs font-mono space-y-2 ${
             apiResponse.breachTriggered
               ? "bg-amber-50 border-amber-300 text-amber-950"
               : "bg-slate-100 border-slate-200 text-slate-800"
           }`}
         >
-          <div className="flex items-center gap-2 font-bold mb-1">
+          <div className="flex items-center gap-2 font-bold">
             <Terminal className="w-4 h-4" />
             <span>Response from /api/admin/portal:</span>
           </div>
           <pre className="whitespace-pre-wrap">{JSON.stringify(apiResponse, null, 2)}</pre>
 
           {apiResponse.breachTriggered && isTampered && (
-            <div className="mt-2.5 p-2 bg-amber-100/70 border border-amber-300 rounded text-[11px] leading-relaxed text-amber-900">
-              <strong>CRITICAL PEDAGOGICAL LESSON:</strong> Look closely! The Token Inspector clearly shows that the cryptographic signature is <strong>INVALID ✗</strong>. Yet, the vulnerable server responded with <strong>ACCESS_GRANTED</strong> because it called <code>decodeJwt()</code> rather than <code>jwtVerify()</code>!
+            <div className="mt-2.5 p-3 bg-amber-100 border border-amber-300 rounded text-[11px] leading-relaxed text-amber-950 flex items-start gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-700 flex-shrink-0 mt-0.5" />
+              <div>
+                <strong>THE CORE LESSON:</strong> The signature is invalid. The vulnerable server accepts it anyway because it decodes the JWT (<code>decodeJwt</code>) instead of cryptographically verifying it (<code>jwtVerify</code>). Modifying the payload invalidated the signature, but without server-side verification, the application blindly authorized the tampered administrator claim.
+              </div>
             </div>
           )}
         </div>

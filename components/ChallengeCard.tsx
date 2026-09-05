@@ -9,11 +9,9 @@ import {
   ChevronUp,
   Terminal,
   AlertOctagon,
-  ArrowRight,
   Search,
-  ShoppingCart,
-  Database,
-  Lock,
+  AlertTriangle,
+  Info,
 } from "lucide-react";
 import { Challenge } from "@/lib/challenges";
 import { INCIDENT_EVIDENCE } from "@/lib/evidence";
@@ -31,37 +29,28 @@ export default function ChallengeCard({ challenge, isSolved, onSolved }: Challen
   const [revealedHints, setRevealedHints] = useState<number[]>([]);
 
   // Interactive Target States
-  // A01
   const [a01OrderId, setA01OrderId] = useState<string>("1001");
   const [a01Result, setA01Result] = useState<any>(null);
 
-  // A02
   const [a02Result, setA02Result] = useState<any>(null);
 
-  // A04
   const [a04ExportData, setA04ExportData] = useState<any>(null);
   const [a04InputPlaintext, setA04InputPlaintext] = useState<string>("");
   const [a04Result, setA04Result] = useState<any>(null);
 
-  // A05
   const [a05SearchTerm, setA05SearchTerm] = useState<string>("");
   const [a05Result, setA05Result] = useState<any>(null);
 
-  // A06
   const [a06Discount, setA06Discount] = useState<number>(0);
   const [a06CouponCode, setA06CouponCode] = useState<string>("WELCOME10");
   const [a06Result, setA06Result] = useState<any>(null);
 
-  // A08
   const [a08ConfigJson, setA08ConfigJson] = useState<string>('{\n  "maintenanceMode": true,\n  "rateLimitBypass": true\n}');
-  const [a08Checksum, setA08Checksum] = useState<string>("self-calculated-or-any-hash");
   const [a08Result, setA08Result] = useState<any>(null);
 
-  // A09
   const [a09Attempts, setA09Attempts] = useState<number>(0);
   const [a09AuditData, setA09AuditData] = useState<any>(null);
 
-  // A10
   const [a10Quantity, setA10Quantity] = useState<number>(-1);
   const [a10Result, setA10Result] = useState<any>(null);
 
@@ -77,7 +66,7 @@ export default function ChallengeCard({ challenge, isSolved, onSolved }: Challen
     }
   };
 
-  // Challenge Execution Handlers
+  // Execution Handlers
   const handleA01FetchOrder = async (idToFetch: string) => {
     setIsLoading(true);
     try {
@@ -190,7 +179,6 @@ export default function ChallengeCard({ challenge, isSolved, onSolved }: Challen
         parsed = JSON.parse(a08ConfigJson);
       } catch (_e) {}
 
-      // calculate sha256 of payload in browser
       const encoder = new TextEncoder();
       const data = encoder.encode(JSON.stringify(parsed));
       const hashBuffer = await crypto.subtle.digest("SHA-256", data);
@@ -370,14 +358,15 @@ export default function ChallengeCard({ challenge, isSolved, onSolved }: Challen
                 Northstar Portal Target Interface
               </div>
 
-              {/* A01 Target */}
+              {/* A01 Target: Clear Distinction of AuthN vs AuthZ */}
               {challenge.id === "A01" && (
                 <div className="space-y-3">
-                  <div className="p-2.5 bg-white border border-slate-200 rounded text-xs space-y-2">
-                    <div className="text-slate-500 text-[11px] font-mono">
-                      Logged in as: <strong>alex@northstar.local</strong> · Your active order is #1001
+                  <div className="p-3 bg-white border border-slate-200 rounded text-xs space-y-2.5">
+                    <div className="p-2 bg-blue-50/60 border border-blue-200 rounded text-[11px] font-mono text-blue-950 space-y-1">
+                      <div><strong>Authentication (Who are you?):</strong> Verified as <code>alex@northstar.local</code> (Order #1001 owner).</div>
+                      <div><strong>Authorization (What can you access?):</strong> Should only access your own records. What happens if you request #1002?</div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 pt-1">
                       <label className="text-xs font-medium text-slate-700">Order Lookup ID:</label>
                       <input
                         type="text"
@@ -424,17 +413,26 @@ export default function ChallengeCard({ challenge, isSolved, onSolved }: Challen
                 </div>
               )}
 
-              {/* A03 Target */}
+              {/* A03 Target (Forensic Simulation) */}
               {challenge.id === "A03" && (
-                <ForensicAuditViewer
-                  onSolved={(flag) => onSolved("A03", flag)}
-                  isSolved={isSolved}
-                />
+                <div className="space-y-2">
+                  <div className="p-2 bg-slate-100 border border-slate-200 rounded text-[11px] font-mono text-slate-700 flex items-center gap-1.5">
+                    <Info className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" />
+                    <span><strong>Forensic Supply Chain Simulation:</strong> Audit build manifests and provenance logs. No real third-party packages are installed or executed.</span>
+                  </div>
+                  <ForensicAuditViewer
+                    onSolved={(flag) => onSolved("A03", flag)}
+                    isSolved={isSolved}
+                  />
+                </div>
               )}
 
-              {/* A04 Target */}
+              {/* A04 Target (Synthetic Training Credential) */}
               {challenge.id === "A04" && (
                 <div className="space-y-3">
+                  <div className="p-2 bg-slate-100 border border-slate-200 rounded text-[11px] font-mono text-slate-700">
+                    <strong>LAB SAFETY BOUNDARY:</strong> All credentials and backup tokens in this challenge are 100% synthetic training fixtures. No real accounts or passwords exist.
+                  </div>
                   <div className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded text-xs">
                     <span className="text-slate-700 font-mono">Export Alex Rivera&apos;s Account Backup:</span>
                     <button
@@ -477,9 +475,13 @@ export default function ChallengeCard({ challenge, isSolved, onSolved }: Challen
                 </div>
               )}
 
-              {/* A05 Target */}
+              {/* A05 Target (Deterministic SQLi Simulation) */}
               {challenge.id === "A05" && (
                 <div className="space-y-3">
+                  <div className="p-2 bg-slate-100 border border-slate-200 rounded text-[11px] font-mono text-slate-700 flex items-center gap-1.5">
+                    <Info className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" />
+                    <span><strong>Deterministic SQL Injection Simulation:</strong> Models dynamic string concatenation into an SQL statement (<code>SELECT * FROM customers WHERE name LIKE &apos;%[INPUT]%&apos;</code>) to demonstrate boolean tautology attacks without executing destructive SQL.</span>
+                  </div>
                   <div className="flex items-center gap-2 p-3 bg-white border border-slate-200 rounded text-xs">
                     <Search className="w-4 h-4 text-slate-500" />
                     <input
@@ -596,9 +598,12 @@ export default function ChallengeCard({ challenge, isSolved, onSolved }: Challen
                 </div>
               )}
 
-              {/* A09 Target */}
+              {/* A09 Target (Stateless Logging Absence Demonstration) */}
               {challenge.id === "A09" && (
                 <div className="space-y-3">
+                  <div className="p-2 bg-slate-100 border border-slate-200 rounded text-[11px] font-mono text-slate-700">
+                    <strong>Detection Capability Assessment:</strong> Demonstrates the critical security flaw where authentication failures are dropped silently with zero logging or alert emission.
+                  </div>
                   <div className="p-3 bg-white border border-slate-200 rounded text-xs space-y-3">
                     <div className="flex items-center justify-between">
                       <span>Simulate Failed Login Attacks on <code>admin@northstar.local</code>:</span>
@@ -636,7 +641,7 @@ export default function ChallengeCard({ challenge, isSolved, onSolved }: Challen
                 </div>
               )}
 
-              {/* A10 Target */}
+              {/* A10 Target (Fail-Open Exception) */}
               {challenge.id === "A10" && (
                 <div className="space-y-3">
                   <div className="p-3 bg-white border border-slate-200 rounded text-xs space-y-3">
@@ -657,7 +662,7 @@ export default function ChallengeCard({ challenge, isSolved, onSolved }: Challen
                       </button>
                     </div>
                     <div className="text-slate-500 text-[11px]">
-                      Target: Pass a negative quantity (`-1`) to trigger arithmetic underflow exception.
+                      Target: Pass an invalid negative quantity (<code>-1</code>) to trigger an arithmetic underflow exception. The generic handler fails open and completes the order as PAID.
                     </div>
                   </div>
 

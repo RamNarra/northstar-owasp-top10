@@ -25,24 +25,25 @@ This application is intentionally vulnerable for educational purposes, but is st
 - ❌ **NO** destructive SQL queries (DROP, DELETE, UPDATE).
 - ❌ **NO** real user data, real credentials, or live payment gateways.
 - ✅ All targets, orders, credit card references, and accounts are synthetic fixtures.
+- ℹ️ **Pedagogical Simulations**: Chapters A03 and A05 are explicitly designed as deterministic simulations. A03 simulates CI/CD supply-chain provenance verification without executing untrusted packages, and A05 simulates dynamic SQL query string concatenation without executing destructive SQL queries.
 
 ---
 
 ## 🗺️ OWASP Top 10:2025 Chapter Mapping
 
-| Chapter | OWASP Top 10:2025 Category | Story Chapter Title | Exploit / Investigation |
-|---|---|---|---|
-| **00** | Incident Briefing | Breach Triage | Story briefing & incident declaration |
-| **01** | **A01: Broken Access Control** | The Customer Database | Insecure Direct Object Reference (IDOR) on `/api/orders/:id` |
-| **02** | **A02: Security Misconfiguration** | The Forgotten Debug Switch | Accidental production exposure of `/api/debug/config` |
-| **03** | **A03: Software Supply Chain Failures** | The Dependency Nobody Checked | Forensic audit of CI/CD manifest identifying unverified package mirror |
-| **04** | **A04: Cryptographic Failures** | The Old Secret | Account backup credential protected only with Base64 encoding |
-| **05** | **A05: Injection** | The Customer Search | SQL injection tautology (`' OR '1'='1`) exposing confidential treasury account |
-| **06** | **A06: Insecure Design** | The Coupon Disaster | Business logic state flaw allowing repeated redemption of `WELCOME10` |
-| **07** | **A07: Authentication Failures** | The Compromised Token | **JWT Lab Centerpiece**: Tampering payload `role: admin`, signature bypass |
-| **08** | **A08: Software/Data Integrity Failures**| The "Trusted" Update | Configuration importer trusting client-supplied self-signed checksum |
-| **09** | **A09: Logging & Alerting Failures** | The Missing Alarm | Brute-force failed logins completely unlogged in security audit trail |
-| **10** | **A10: Mishandling of Exceptional Conditions**| The Checkout Crash | Negative quantity triggers calculation error that fails open as `PAID` |
+| Chapter | OWASP Top 10:2025 Category | Story Chapter Title | Exploit / Investigation | Implementation Type |
+|---|---|---|---|---|
+| **00** | Incident Briefing | Breach Triage | Story briefing & incident declaration | Informational |
+| **01** | **A01: Broken Access Control** | The Customer Database | Insecure Direct Object Reference (IDOR) on `/api/orders/:id` | Functional IDOR |
+| **02** | **A02: Security Misconfiguration** | The Forgotten Debug Switch | Accidental production exposure of `/api/debug/config` | Real Endpoint Exposure |
+| **03** | **A03: Software Supply Chain Failures** | The Dependency Nobody Checked | Forensic audit of CI/CD manifest identifying unverified package mirror | Deterministic Simulation |
+| **04** | **A04: Cryptographic Failures** | The Old Secret | Account backup credential protected only with Base64 encoding | Synthetic Credential |
+| **05** | **A05: Injection** | The Customer Search | SQL injection tautology (`' OR '1'='1`) exposing confidential treasury account | Deterministic Simulation |
+| **06** | **A06: Insecure Design** | The Coupon Disaster | Business logic state flaw allowing repeated redemption of `WELCOME10` | Business Logic Flaw |
+| **07** | **A07: Authentication Failures** | The Compromised Token | **JWT Lab Centerpiece**: Tampering payload `role: admin`, signature bypass | Real JWT Verification Flaw |
+| **08** | **A08: Software/Data Integrity Failures**| The "Trusted" Update | Configuration importer trusting client-supplied self-signed checksum | Integrity Boundary Flaw |
+| **09** | **A09: Logging & Alerting Failures** | The Missing Alarm | Brute-force failed logins completely unlogged in security audit trail | Detection Assessment |
+| **10** | **A10: Mishandling of Exceptional Conditions**| The Checkout Crash | Negative quantity triggers calculation error that fails open as `PAID` | Fail-Open Exception |
 
 ---
 
@@ -53,6 +54,8 @@ The codebase is structured to be readable and teachable directly from source:
 ```
 ├── app/
 │   ├── api/                      # Deterministic serverless API endpoints
+│   │   ├── instructor/auth/      # Server-side instructor authentication
+│   │   └── ...                   # Challenge API routes
 │   ├── incident/page.tsx         # Main 10-chapter investigation timeline
 │   ├── instructor/page.tsx       # Gated instructor solutions portal (/instructor)
 │   └── page.tsx                  # Incident landing page & briefing
@@ -67,7 +70,7 @@ The codebase is structured to be readable and teachable directly from source:
 │   ├── vulnerabilities/          # Isolated, readable vulnerable handlers
 │   └── secure/                   # Matching secure remediation reference code
 └── scripts/
-    └── smoke-test.mjs            # Automated verification test suite
+    └── smoke-test.ts             # Automated verification test suite
 ```
 
 ---
@@ -102,7 +105,11 @@ Facilitators can navigate to `/instructor` to view:
 - Pedagogical tips for stuck students
 - Complete side-by-side code comparisons
 
-Default development passcode: `northstar-instructor-2025` (configurable via `NEXT_PUBLIC_INSTRUCTOR_PASSCODE`).
+Authentication is validated **strictly server-side** via `POST /api/instructor/auth` using the server environment variable:
+```bash
+INSTRUCTOR_PASSCODE=your_secret_passcode
+```
+Default development fallback: `northstar-instructor-2025`.
 
 ---
 

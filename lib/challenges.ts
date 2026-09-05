@@ -34,7 +34,7 @@ export const CHALLENGES: Challenge[] = [
     briefing:
       "Customer Alex Rivera reported seeing order details belonging to another customer after clicking around recent invoices in the portal.",
     objective:
-      "While authenticated as Alex Rivera (whose active order is #1001), query order #1002 and retrieve Bob Vance's confidential order.",
+      "Authentication ≠ Authorization: While authenticated as Alex Rivera (whose active order is #1001), query order #1002 and retrieve Bob Vance's confidential order without authorization checks.",
     hints: [
       "Look at how the order lookup request references order identifiers.",
       "Alex's order is #1001. What happens if you inspect the lookup endpoint and request #1002?",
@@ -118,9 +118,9 @@ export async function GET(req) {
     points: 150,
     flag: "NORTHSTAR{supply_chain_unverified_provenance_a03}",
     briefing:
-      "CI/CD build logs show that during deployment bundle generation, an external package was fetched from an untrusted mirror rather than the official internal registry.",
+      "Forensic Simulation: CI/CD build logs show that during deployment bundle generation, an external dependency was pulled from an untrusted mirror rather than the official internal registry.",
     objective:
-      "Perform a forensic audit of the deployment package manifest and identify the malicious untrusted dependency that bypassed the internal CDN integrity gate.",
+      "Perform a forensic audit of the synthetic deployment manifest and identify the untrusted dependency that bypassed the internal CDN integrity gate. (Safe simulation: no real code executed).",
     hints: [
       "Review the packages listed in the deployment manifest. Check their `source` URLs and registry authorities.",
       "Notice which package is being pulled from `http://mirror.untrusted-pkg.net` instead of `https://cdn.northstar.local`.",
@@ -155,9 +155,9 @@ dependencies: {
     points: 100,
     flag: "NORTHSTAR{encoding_is_not_encryption_a04}",
     briefing:
-      "A leaked customer backup archive revealed that sensitive credentials were saved using an algorithm that provides zero confidentiality.",
+      "A customer backup archive revealed that sensitive credentials were saved using an algorithm that provides zero confidentiality.",
     objective:
-      "Export Alex Rivera's account backup from `/api/account/export?user=alex`, inspect the `credential_blob`, and decode the plaintext password.",
+      "Inspect Alex Rivera's synthetic backup export from `/api/account/export?user=alex`, identify that `credential_blob` uses Base64 encoding rather than encryption, and decode the plaintext password.",
     hints: [
       "Inspect the exported JSON file. Look at the string in `credential_blob`.",
       "Strings ending with `=` or `==` composed of letters and numbers are often Base64 encoded.",
@@ -195,21 +195,21 @@ export async function storePassword(plainPassword) {
     points: 150,
     flag: "NORTHSTAR{sqli_dynamic_query_a05}",
     briefing:
-      "Support analysts noticed that entering certain punctuation characters in the customer directory search causes internal accounting records to appear in the results.",
+      "Support analysts noticed that entering quote characters in the customer directory search causes internal accounting records to appear in the results.",
     objective:
-      "Exploit dynamic query concatenation in `/api/search` by injecting a boolean SQL expression (e.g. `' OR '1'='1`) to extract confidential internal records.",
+      "Deterministic SQL Injection Simulation: Exploit dynamic query string concatenation modeling in `/api/search` by injecting a classic boolean tautology (`' OR '1'='1`) to dump confidential records.",
     hints: [
-      "The search term is concatenated into an SQL string: `SELECT * FROM customers WHERE name LIKE '%[INPUT]%'`.",
+      "The search term models dynamic concatenation into an SQL string: `SELECT * FROM customers WHERE name LIKE '%[INPUT]%'`.",
       "How can you close the string literal and inject a condition that is always true?",
       "Search for `' OR '1'='1` or `' OR 1=1 --` to dump all records including the confidential internal billing account.",
     ],
     debrief: {
       whatHappened:
-        "User input was concatenated directly into an interpreter query string without parameterization or escaping.",
+        "User input was concatenated directly into a simulated interpreter query string without parameterization or escaping.",
       whyItWorked:
         "The injected quote `'` broke out of the data context into the query syntax, and `'1'='1'` evaluated to true for every record in the table.",
       owasp2025Note:
-        "Injection remains a critical risk in OWASP Top 10:2025. Preventing injection strictly requires parameterized queries / prepared statements rather than string concatenation.",
+        "Injection remains a critical risk in OWASP Top 10:2025. Preventing injection strictly requires parameterized queries / prepared statements rather than string concatenation. This challenge deterministically simulates this vulnerability safely.",
       vulnerableSnippet: `// Vulnerable: raw string concatenation into database query
 const query = "SELECT * FROM customers WHERE name LIKE '%" + input + "%'";
 const results = db.raw(query);`,
@@ -231,7 +231,7 @@ const results = await db.execute(query, [\`%\${input}%\`]);`,
     briefing:
       "Northstar finance reported several customer orders completing with massive discounts far below allowed promotional margins.",
     objective:
-      "Exploit a missing state enforcement rule in the billing cart: apply the single-use `WELCOME10` promotional coupon repeatedly until the total discount is at least \$30.",
+      "Exploit a missing state enforcement rule in the billing cart: apply the single-use `WELCOME10` promotional coupon repeatedly until the total discount reaches at least \$30.",
     hints: [
       "The system offers promotional code `WELCOME10` ($10 off a $100 cart). What happens if you apply it more than once?",
       "Does the server check whether `coupon_applied` is already true before subtracting the discount?",
@@ -376,9 +376,9 @@ export async function importConfig(payload, trustedPublicKey) {
     points: 100,
     flag: "NORTHSTAR{silent_failures_no_audit_logging_a09}",
     briefing:
-      "An attacker attempted credential stuffing against administrator accounts, but the incident response team detected nothing in real time.",
+      "Detection Capability Assessment: An attacker attempted credential stuffing against administrator accounts, but the incident response team detected nothing in real time.",
     objective:
-      "Perform 5 consecutive failed login attempts against `admin@northstar.local`, then inspect the audit log at `/api/audit` to confirm that failed authentication attempts are completely unrecorded.",
+      "Perform consecutive failed login attempts against `admin@northstar.local`, then inspect the audit log at `/api/audit` to confirm that failed authentication attempts are completely unrecorded.",
     hints: [
       "Attempt to sign in with incorrect credentials multiple times.",
       "Check the audit log at `/api/audit` or through the investigation panel.",

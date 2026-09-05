@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   KeyRound,
-  Lock,
   ArrowLeft,
   CheckCircle,
   AlertTriangle,
@@ -12,23 +11,60 @@ import {
   Terminal,
   ShieldAlert,
 } from "lucide-react";
-import { CHALLENGES } from "@/lib/challenges";
+
+interface InstructorSolution {
+  id: string;
+  chapterNumber: string;
+  owaspId: string;
+  owaspTitle: string;
+  storyTitle: string;
+  tier: string;
+  difficulty: string;
+  points: number;
+  flag: string;
+  objective: string;
+  hints: [string, string, string];
+  debrief: {
+    whatHappened: string;
+    whyItWorked: string;
+    owasp2025Note: string;
+    vulnerableSnippet: string;
+    secureSnippet: string;
+  };
+}
 
 export default function InstructorPage() {
   const [passcode, setPasscode] = useState<string>("");
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [solutions, setSolutions] = useState<InstructorSolution[]>([]);
   const [errorMsg, setErrorMsg] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const expectedPasscode =
-    process.env.NEXT_PUBLIC_INSTRUCTOR_PASSCODE || "northstar-instructor-2025";
-
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (passcode.trim() === expectedPasscode) {
-      setIsAuthenticated(true);
-      setErrorMsg("");
-    } else {
-      setErrorMsg("Invalid instructor passcode. (Default demo: northstar-instructor-2025)");
+    setIsLoading(true);
+    setErrorMsg("");
+
+    try {
+      const res = await fetch("/api/instructor/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ passcode: passcode.trim() }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.authorized) {
+        setIsAuthenticated(true);
+        setSolutions(data.solutions || []);
+        setErrorMsg("");
+      } else {
+        setErrorMsg(data.error || "Invalid instructor credentials.");
+      }
+    } catch (_err) {
+      setErrorMsg("Authentication request failed. Check server connectivity.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -45,14 +81,14 @@ export default function InstructorPage() {
                 Instructor Portal Gate
               </h1>
               <p className="text-xs text-slate-500 font-mono">
-                Northstar Security Incident Solutions
+                Server-Side Authentication Required
               </p>
             </div>
           </div>
 
           <p className="text-xs text-slate-600 leading-relaxed">
-            This section contains complete vulnerability analysis, exploit payloads, flags, and
-            teaching recommendations for workshop facilitators.
+            Access to the master solutions catalog, deterministic exploit commands, and pedagogical
+            remediations requires server-side instructor authentication.
           </p>
 
           <form onSubmit={handleLogin} className="space-y-3">
@@ -62,33 +98,30 @@ export default function InstructorPage() {
               </label>
               <input
                 type="password"
-                placeholder="Enter passcode..."
+                placeholder="Enter workshop passcode..."
                 value={passcode}
                 onChange={(e) => setPasscode(e.target.value)}
                 className="w-full px-3 py-2 border border-slate-300 rounded text-xs font-mono focus:outline-none focus:ring-1 focus:ring-slate-900"
+                required
               />
             </div>
 
             {errorMsg && (
-              <div className="p-2 bg-red-50 border border-red-200 text-red-700 text-xs rounded font-mono">
+              <div className="p-2.5 bg-red-50 border border-red-200 text-red-700 text-xs rounded font-mono">
                 {errorMsg}
               </div>
             )}
 
             <button
               type="submit"
-              className="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white rounded text-xs font-semibold transition-colors"
+              disabled={isLoading || !passcode}
+              className="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white rounded text-xs font-semibold transition-colors disabled:opacity-50"
             >
-              Access Instructor Dashboard
+              {isLoading ? "Verifying Credentials..." : "Authenticate as Instructor"}
             </button>
           </form>
 
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-mono text-slate-500">
-            <span>Passcode hint:</span>
-            <code>northstar-instructor-2025</code>
-          </div>
-
-          <div className="text-center pt-1">
+          <div className="pt-2 text-center">
             <Link
               href="/"
               className="text-xs text-slate-500 hover:text-slate-900 transition-colors inline-flex items-center gap-1"
@@ -131,6 +164,11 @@ export default function InstructorPage() {
             challenges independently using the 3 progressive hints on their cards. If a student is
             stuck after Hint 3, review the exact exploit sequence below.
           </p>
+          <div className="p-2 bg-white border border-slate-300 rounded font-mono text-[11px] text-slate-800">
+            <strong>Simulation Note:</strong> Chapters A03 and A05 are explicitly designed as deterministic
+            simulations. A03 simulates CI/CD supply-chain provenance verification, and A05 simulates dynamic
+            SQL tautology injection without executing destructive SQL queries.
+          </div>
         </div>
 
         {/* Master Flags Table */}
@@ -150,7 +188,7 @@ export default function InstructorPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-mono">
-                {CHALLENGES.map((ch) => (
+                {solutions.map((ch) => (
                   <tr key={ch.id} className="hover:bg-slate-50">
                     <td className="p-3 font-semibold text-slate-900">{ch.chapterNumber}</td>
                     <td className="p-3 text-blue-700">{ch.owaspId}</td>
@@ -170,7 +208,7 @@ export default function InstructorPage() {
             Detailed Exploitation &amp; Remediation Playbook
           </h2>
 
-          {CHALLENGES.map((ch) => (
+          {solutions.map((ch) => (
             <div
               key={ch.id}
               className="border border-slate-200 rounded-lg bg-white p-5 space-y-4 shadow-sm"
