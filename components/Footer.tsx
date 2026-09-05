@@ -19,7 +19,7 @@ export default function Footer() {
             <ul className="space-y-2.5 text-slate-500">
               <li><Link href="/products" className="hover:text-slate-900 transition-colors">Distributed Infrastructure</Link></li>
               <li><Link href="/products" className="hover:text-slate-900 transition-colors">Zero-Trust Telemetry</Link></li>
-              <li><Link href="/products" className="hover:text-slate-900 transition-colors">Enterprise Observability</Link></li>
+              <li><Link href="/operations" className="hover:text-slate-900 transition-colors">Platform Operations</Link></li>
               <li><Link href="/about" className="hover:text-slate-900 transition-colors">Platform Compliance</Link></li>
             </ul>
           </div>

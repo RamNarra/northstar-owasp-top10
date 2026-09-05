@@ -22,7 +22,7 @@ async function main() {
   }
 
   // 1. Pages HTTP 200
-  const pages = ["/", "/products", "/products/quantum-vpn-gateway", "/cart", "/partners", "/about", "/account"];
+  const pages = ["/", "/products", "/products/quantum-vpn-gateway", "/cart", "/partners", "/about", "/account", "/operations"];
   for (const page of pages) {
     const res = await fetch(`${BASE_URL}${page}`);
     assert(`Page ${page} status 200`, res.status === 200, `Got status ${res.status}`);

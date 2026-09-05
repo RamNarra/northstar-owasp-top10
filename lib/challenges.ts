@@ -10,7 +10,7 @@ export interface Challenge {
   flag: string;
   briefing: string;
   objective: string;
-  hints: [string, string, string];
+  hints: string[];
   debrief: {
     whatHappened: string;
     whyItWorked: string;
@@ -120,11 +120,11 @@ export async function GET(req) {
     briefing:
       "Forensic Simulation: CI/CD build logs show that during deployment bundle generation, an external dependency was pulled from an untrusted mirror rather than the official internal registry.",
     objective:
-      "Perform a forensic audit of the synthetic deployment manifest and identify the untrusted dependency that bypassed the internal CDN integrity gate. (Safe simulation: no real code executed).",
+      "Perform a forensic audit of the synthetic deployment manifest under Platform Operations (`/operations`) and identify the untrusted dependency that bypassed the internal CDN integrity gate. (Safe simulation: no real code executed).",
     hints: [
-      "Review the packages listed in the deployment manifest. Check their `source` URLs and registry authorities.",
-      "Notice which package is being pulled from `http://mirror.untrusted-pkg.net` instead of `https://cdn.northstar.local`.",
-      "Identify `analytics-telemetry-v2` as the unverified package source to submit the forensic report.",
+      "Navigate to Platform Operations (`/operations`) in the top navigation bar.",
+      "Review the packages listed in Deployment Dependencies. Check their `source` URLs and registry authorities.",
+      "Notice which package is being pulled from `http://mirror.untrusted-pkg.net` instead of `https://cdn.northstar.local`. Select `analytics-telemetry-v2` and audit provenance.",
     ],
     debrief: {
       whatHappened:
@@ -280,11 +280,12 @@ export async function applyCoupon(cart, code) {
     briefing:
       "SOC detected an unprivileged user session ('alex@northstar.local') accessing the high-security Executive Administrator Dashboard.",
     objective:
-      "Inspect Alex's issued JWT token, alter the payload claim from `role: 'user'` to `role: 'admin'`, observe that the signature becomes invalid, and submit the tampered token to `/api/admin/portal`.",
+      "Inspect Alex's issued JWT token under Account (`/account`), alter the payload claim from `role: 'user'` to `role: 'admin'`, observe that the signature becomes invalid, and submit the tampered token to gain access to the Executive Administration Dashboard (`/admin`).",
     hints: [
+      "Log in as `alex@northstar.local` / `password123!` and open Account -> Security & Session.",
       "Inspect the JWT structure in the Session Inspector: HEADER . PAYLOAD . SIGNATURE.",
-      "Inspect the JWT. What happens to the signature if you change the `role` claim? Try `user → admin`, then submit the modified token.",
-      "Submit your tampered token to `/api/admin/portal`. The vulnerable backend calls `decodeJwt` instead of `jwtVerify`, trusting the claim despite the invalid signature!",
+      "Manually edit the JSON claims in the textarea (change `\"role\": \"user\"` to `\"role\": \"admin\"`). Notice the signature flips to `Signature: Invalid ✗`.",
+      "Click 'Test Tampered Token' or submit to `/api/admin/portal`. The server trusts the unverified claim and grants access to `/admin`!",
     ],
     debrief: {
       whatHappened:
@@ -330,11 +331,11 @@ export async function authorizeAdmin(token, secretKey) {
     briefing:
       "The system configuration importer allows operators to load runtime flags, claiming to perform strict checksum validation on incoming payloads.",
     objective:
-      "Alter the configuration payload to enable `maintenanceMode: true`, compute or provide a matching checksum in the same client request, and observe the server accepting it as trusted.",
+      "Under Platform Operations (`/operations`), alter the configuration payload to enable `maintenanceMode: true`, compute or provide a matching checksum in the same client request, and observe the server accepting it as trusted.",
     hints: [
-      "The importer endpoint accepts `{ config: {...}, checksum: '...' }`.",
-      "Look at where the server gets the 'trusted' checksum to verify against.",
-      "The server computes the hash of `config` and compares it to the client-supplied `checksum` property from the same untrusted JSON body! Supply matching values to bypass.",
+      "Navigate to Platform Operations (`/operations`) -> Runtime Configuration Import.",
+      "Notice how the importer accepts `{ config: {...}, checksum: '...' }` from the client request.",
+      "The server computes the hash of `config` and compares it to the client-supplied `checksum` from the same untrusted JSON body! Submit with `maintenanceMode: true` to bypass.",
     ],
     debrief: {
       whatHappened:
