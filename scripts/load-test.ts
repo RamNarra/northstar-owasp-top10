@@ -29,33 +29,25 @@ interface ConcurrencyResult {
   p99Ms: number;
 }
 
-const TARGET_BASE_URL = process.env.LOAD_TEST_TARGET || "http://localhost:3000";
+const TARGET_BASE_URL = process.env.LOAD_TEST_TARGET || "https://northstar-owasp-top10.vercel.app";
 
-const ACTIONS = [
-  { path: "/", method: "GET" },
-  { path: "/products", method: "GET" },
-  { path: "/products/quantum-vpn-gateway", method: "GET" },
-  { path: "/about", method: "GET" },
-  { path: "/partners", method: "GET" },
-  { path: "/api/orders/1001", method: "GET" },
-  { path: "/api/orders/1002", method: "GET" },
-  { path: "/api/search?q=Apex", method: "GET" },
-  { path: "/api/search?q=" + encodeURIComponent("' OR '1'='1"), method: "GET" },
-  { path: "/api/debug/config", method: "GET" },
+// Realistic 6-step workshop student journey
+const WORKSHOP_JOURNEY = [
+  { step: "1. Homepage", path: "/", method: "GET" },
+  { step: "2. Product Detail", path: "/products/quantum-vpn-gateway", method: "GET" },
   {
+    step: "3. Student Auth",
     path: "/api/auth/login",
     method: "POST",
     body: { email: "alex@northstar.local", password: "password123!" },
   },
+  { step: "4. Own Order #1001", path: "/api/orders/1001", method: "GET" },
+  { step: "5. A01 IDOR Order #1002", path: "/api/orders/1002", method: "GET" },
   {
-    path: "/api/cart/coupon",
+    step: "6. A07 JWT Admin Exploit",
+    path: "/api/admin/portal",
     method: "POST",
-    body: { currentDiscount: 2000, code: "WELCOME10" },
-  },
-  {
-    path: "/api/checkout",
-    method: "POST",
-    body: { itemId: "starter-telemetry", quantity: 1 },
+    body: { token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhbGV4QG5vcnRoc3Rhci5sb2NhbCIsIm5hbWUiOiJBbGV4IFJpdmVyYSIsInJvbGUiOiJhZG1pbiJ9.bogussignature" },
   },
 ];
 
@@ -138,11 +130,9 @@ async function runTier(targetUrl: string, concurrency: number, requestsPerUser =
   for (let u = 0; u < concurrency; u++) {
     workerPool.push(
       (async () => {
-        for (let r = 0; r < requestsPerUser; r++) {
-          const action = ACTIONS[(u + r) % ACTIONS.length];
+        for (const action of WORKSHOP_JOURNEY) {
           const sample = await makeRequest(targetUrl, action);
           samples.push(sample);
-          completed++;
         }
       })()
     );
