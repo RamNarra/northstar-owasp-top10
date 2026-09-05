@@ -18,7 +18,12 @@ export default function OrderDetailPage() {
       setLoading(true);
       setError("");
       try {
-        const res = await fetch(`/api/orders/${orderId}`);
+        const token = localStorage.getItem("northstar_jwt_token");
+        const headers: Record<string, string> = {};
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        }
+        const res = await fetch(`/api/orders/${orderId}`, { headers });
         const data = await res.json();
 
         if (res.ok && data.order) {
